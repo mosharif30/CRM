@@ -3,41 +3,75 @@ import { connectDb } from "@/utils/connectDb";
 import type { NextApiRequest, NextApiResponse } from "next";
 import User from "@/models/User";
 
-type Data = {
-  massage: string;
-  // data?: { name: string; phone: number; age?: number };
-  data?: any;
+type UserData = {
+  name: string;
+  phone: number;
+  age?: number;
 };
+
+type ApiResponse<T> = {
+  message: string;
+  data?: T;
+};
+
+async function connectToDatabase() {
+  try {
+    await connectDb();
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error connecting to the database");
+  }
+}
+
+async function postHandler(
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponse<UserData>>
+) {
+  const data: UserData = req.body;
+
+  if (!data.name || data.name.length <= 3) {
+    return res.status(422).json({
+      message: "Wrong data",
+    });
+  }
+
+  try {
+    const user = await User.create(data);
+    return res
+      .status(200)
+      .json({ message: "Data stored successfully", data: user });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error storing data" });
+  }
+}
+
+async function getHandler(
+  _req: NextApiRequest,
+  res: NextApiResponse<ApiResponse<UserData[]>>
+) {
+  try {
+    const users = await User.find();
+    return res
+      .status(200)
+      .json({ message: "Data retrieved successfully", data: users });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error retrieving data" });
+  }
+}
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<ApiResponse<any>>
 ) {
-  try {
-    connectDb();
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ massage: "error to connect db" });
-  }
-  if (req.method === "POST") {
-    const data = req.body;
+  await connectToDatabase();
 
-    if (!data.name || data.name.length <= 3) {
-      res.status(422).json({
-        massage: "wrong data",
-      });
-    } else {
-      try {
-        console.log(data);
-        const user = await User.create(data);
-        res.status(200).json({ massage: "done", data: user });
-      } catch (error) {
-        console.log(error);
-        res.status(500).json({ massage: "error to store data" });
-      }
-    }
+  if (req.method === "POST") {
+    return postHandler(req, res);
   } else if (req.method === "GET") {
-    const users = await User.find();
-    res.status(200).json({ massage: "done", data: users });
+    return getHandler(req, res);
+  } else {
+    return res.status(405).json({ message: "Method Not Allowed" });
   }
 }

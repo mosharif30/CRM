@@ -13,6 +13,7 @@ interface IUser {
     alley: string;
   };
   createdAt: string;
+  [key: string]: any;
 }
 
 function User() {
