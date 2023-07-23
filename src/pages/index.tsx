@@ -1,11 +1,70 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-
-const inter = Inter({ subsets: ['latin'] })
-
+import Head from "next/head";
+import { ChangeEvent, FormEvent, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
+interface Address {
+  city: string;
+  street: string;
+  alley: string;
+}
+interface FormData {
+  name: string;
+  phone: string;
+  age: number | "";
+  email: string;
+  address: Address;
+}
 export default function Home() {
+  const router = useRouter();
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    age: "",
+    phone: "",
+    email: "",
+    address: { city: "", street: "", alley: "" },
+  });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    if (name.startsWith("address.")) {
+      const addressField = name.split(".")[1];
+      setFormData((prevData) => ({
+        ...prevData,
+        address: {
+          ...prevData.address,
+          [addressField]: value,
+        },
+      }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
+  };
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+
+    console.log(formData);
+    axios
+      .post("/api/users", formData)
+      .then((res) => {
+        console.log(res);
+        setFormData({
+          name: "",
+          age: "",
+          phone: "",
+          email: "",
+          address: {
+            city: "",
+            street: "",
+            alley: "",
+          },
+        });
+      })
+      .catch((error) => {
+        console.log(error.response);
+      })
+      .finally(() => {
+        console.log("end");
+      });
+  };
   return (
     <>
       <Head>
@@ -14,110 +73,94 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
+      <div className="container">
+        <h1>Beautiful Form</h1>
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
             />
           </div>
-        </div>
+          <div className="form-group">
+            <label htmlFor="age">Age:</label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              value={formData.age}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="phone">Phone:</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <label>Address details: </label>
+          <div className="address-box">
+            <div className="form-group ">
+              <label htmlFor="city">City:</label>
+              <input
+                type="text"
+                id="city"
+                name="address.city"
+                value={formData.address.city}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group ">
+              <label htmlFor="street">Street:</label>
+              <input
+                type="text"
+                id="street"
+                name="address.street"
+                value={formData.address.street}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group ">
+              <label htmlFor="alley">Alley:</label>
+              <input
+                type="text"
+                id="alley"
+                name="address.alley"
+                value={formData.address.alley}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
 
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+          <button type="submit">Submit</button>
+        </form>
+        <button onClick={() => router.push("/users")}>Show all users</button>
+      </div>
     </>
-  )
+  );
 }
