@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+
 interface IUser {
   _id: string;
   name: string;
@@ -18,13 +19,11 @@ interface IUser {
 
 function User() {
   const router = useRouter();
-  console.log(router);
-
   const { userId, isEdit } = router.query;
 
   const [data, setData] = useState<IUser | null>(null);
-  const [isEditing, setIsEditing] = useState(false); // State to determine if in edit mode
-  const [editedData, setEditedData] = useState<IUser | null>(null); // State to hold edited data
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedData, setEditedData] = useState<IUser | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,12 +32,8 @@ function User() {
           `/api/users/${userId}`
         );
         setData(response.data.data);
-
-        console.log(response);
       } catch (error) {
         console.log(error);
-      } finally {
-        // Any code you want to execute after the request (optional)
       }
     };
 
@@ -46,24 +41,19 @@ function User() {
   }, [userId]);
 
   const handleEditClick = () => {
-    // Enable edit mode and initialize editedData with the current data
     setIsEditing(true);
     setEditedData(data);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    // To handle nested properties, split the name using '.' and update the nested property correctly
     const nameParts = name.split(".");
     if (nameParts.length === 1) {
-      // If the property is not nested, update it directly
       setEditedData((prevData) => ({
         ...prevData!,
         [name]: value,
       }));
     } else if (nameParts.length === 2) {
-      // If the property is nested one level deep
       setEditedData((prevData) => ({
         ...prevData!,
         [nameParts[0]]: {
@@ -73,47 +63,45 @@ function User() {
       }));
     }
   };
+
   const handleSaveClick = async () => {
     try {
-      // Send a PUT request to update the user data
       await axios.put(`/api/users/${userId}`, editedData);
-      // Update the original data state with the edited data
       setData(editedData);
-      // Disable edit mode
       setIsEditing(false);
     } catch (error) {
       console.log(error);
     }
   };
-  const handleCancelClick = async () => {
+
+  const handleCancelClick = () => {
     setIsEditing(false);
   };
+
   const handleDeleteClick = async () => {
     try {
-      // Send a PUT request to update the user data
       await axios.delete(`/api/users/${userId}`);
       router.push("/users");
     } catch (error) {
       console.log(error);
     }
   };
-  return (
-    <div className="table-container">
-      <button onClick={() => router.push("/users")}>Show all users</button>
 
+  return (
+    <div className="container mx-auto p-4">
       {data && (
-        <table className="data-table">
+        <table className="table-auto w-full">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Age</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>City</th>
-              <th>Street</th>
-              <th>Alley</th>
-              <th>created At</th>
-              <th>Actions</th>
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Age</th>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Phone</th>
+              <th className="px-4 py-2">City</th>
+              <th className="px-4 py-2">Street</th>
+              <th className="px-4 py-2">Alley</th>
+              <th className="px-4 py-2">Created At</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -125,6 +113,7 @@ function User() {
                     name="name"
                     value={editedData?.name}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border rounded"
                   />
                 </td>
                 <td>
@@ -133,6 +122,7 @@ function User() {
                     name="age"
                     value={editedData?.age}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border rounded"
                   />
                 </td>
                 <td>
@@ -141,6 +131,7 @@ function User() {
                     name="email"
                     value={editedData?.email}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border rounded"
                   />
                 </td>
                 <td>
@@ -149,6 +140,7 @@ function User() {
                     name="phone"
                     value={editedData?.phone}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border rounded"
                   />
                 </td>
                 <td>
@@ -157,6 +149,7 @@ function User() {
                     name="address.city"
                     value={editedData?.address.city}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border rounded"
                   />
                 </td>
                 <td>
@@ -165,6 +158,7 @@ function User() {
                     name="address.street"
                     value={editedData?.address.street}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border rounded"
                   />
                 </td>
                 <td>
@@ -173,12 +167,23 @@ function User() {
                     name="address.alley"
                     value={editedData?.address.alley}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border rounded"
                   />
                 </td>
                 <td>{editedData?.createdAt}</td>
                 <td>
-                  <button onClick={handleSaveClick}>Save</button>
-                  <button onClick={handleCancelClick}>Cancel</button>
+                  <button
+                    className="bg-green-500 text-white font-bold py-1 px-2 rounded shadow mr-2"
+                    onClick={handleSaveClick}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="bg-red-500 text-white font-bold py-1 px-2 rounded shadow"
+                    onClick={handleCancelClick}
+                  >
+                    Cancel
+                  </button>
                 </td>
               </tr>
             ) : (
@@ -192,8 +197,18 @@ function User() {
                 <td>{data.address.alley}</td>
                 <td>{data.createdAt}</td>
                 <td>
-                  <button onClick={handleEditClick}>Edit</button>
-                  <button onClick={handleDeleteClick}>Delete</button>
+                  <button
+                    className="bg-yellow-500 text-white font-bold py-1 px-2 rounded shadow mr-2"
+                    onClick={handleEditClick}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 text-white font-bold py-1 px-2 rounded shadow"
+                    onClick={handleDeleteClick}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             )}

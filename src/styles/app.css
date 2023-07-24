@@ -1,52 +1,7 @@
-.container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-h1 {
-  text-align: center;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-}
-
-label {
-  font-weight: bold;
-}
-
-input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.button {
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 10px;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-/* Additional CSS to create a beautiful box for the address fields */
 .address-box {
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -57,7 +12,7 @@ button:hover {
 .address-box input {
   flex: 1;
 }
-.table-container {
+*/ .table-container {
   padding: 20px;
 }
 
