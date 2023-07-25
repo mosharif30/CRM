@@ -3,13 +3,9 @@ import mongoose from "mongoose";
 export const connectDb = () => {
   try {
     if (mongoose.connections[0].readyState) {
-      console.log("already connected");
-
       return;
     } else {
-      mongoose.connect(process.env.MONGOURI).then(() => {
-        console.log("successfully connected");
-      });
+      mongoose.connect(process.env.MONGOURI).then(() => {});
     }
   } catch (error) {
     console.log("failed to connect to db", error);
